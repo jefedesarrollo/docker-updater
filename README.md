@@ -18,7 +18,7 @@ You need to have the following packages installed on Linux:
 ```
 
 ## How to use
-You can use the application in 2 ways:
+You can use the application in 3 ways:
 1. Sequentially to update several but until you update an application, it does not continue with the next one.
 For this you must use the 2 sh that are inside the repository (apps-updater.sh.example that must configure it and remove the .example extension, docker-compose-updater.sh).
 2. Sequentially to update several but launching each one in the background.
