@@ -1,4 +1,4 @@
-# docker-updater
+# docker-compose-updater
 Bash application that allows updating applications based on docker compose.
 The application checks if there is a new release in a given public repository, if there is a new latest version, the application displays the new version and if there is an error in the download, the previous version is restored.
 For the application to work correctly you must run the first time without errors so that it can save the previous version if a new version is created.
