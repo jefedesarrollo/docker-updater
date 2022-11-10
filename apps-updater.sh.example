@@ -1,0 +1,19 @@
+#!/bin/bash
+# 
+# Description
+# If you need to update multiple applications you must configure and run this file.
+# The sh file only works with an absolute path.
+# Additionally, the repository must have a docker-compose.yml file,
+# which will allow updating the application based on docker compose.
+# The repository must be public.
+#
+# You can run the file in 2 ways:
+# - Allows to release the console after executing the line
+#   nohup {path}/docker-compose-updater.sh {github_username}/{github_repository} &!
+# - Execute the line and wait for it to finish to continue with the next one.
+#   {path}/docker-compose-updater.sh {github_username}/{github_repository}
+# 
+echo "-------- Start Updater Apps --------"
+# Exmaples:
+# /var/tmp/docker-compose-updater.sh fabian/repository-example
+echo "--------- End Updater Apps ---------"
