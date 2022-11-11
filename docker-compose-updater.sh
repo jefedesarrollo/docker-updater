@@ -91,8 +91,8 @@ else
         # Deploy the application
         docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
 
-        check_error_version_latest=$?
-        if [ $check_error_version_latest -eq 0 ]; then
+        exit_code=$?
+        if [ $exit_code -eq 0 ]; then
             echo "Successfully deploy latest"
             # Store the latest version and remove temporary files
             echo "$LATEST_VERSION" >"$DEPLOYMENT_DIR"/LATEST_VERSION.txt
