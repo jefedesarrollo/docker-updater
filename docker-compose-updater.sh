@@ -54,7 +54,7 @@ LATEST_VERSION=$(get_latest_release "$GITHUB_REPOSITORY")
 # Check is a new version to deploy
 if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     if [ -e "$DEPLOYMENT_DIR" ]; then
-        docker-compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
+        docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
     fi
     echo "Docker compose is already running the latest version ($LATEST_VERSION)"
 else
@@ -79,7 +79,7 @@ else
 
         # Stop the current deployment
         if [ -e "$DEPLOYMENT_DIR" ]; then
-            docker-compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
+            docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
         else
             mkdir -p "$DEPLOYMENT_DIR"
         fi
@@ -89,7 +89,7 @@ else
         mv "$TMP_DIR"/* "$DEPLOYMENT_DIR"
 
         # Deploy the application
-        docker-compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
+        docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
 
         check_error_version_latest=$?
         if [ $check_error_version_latest -eq 0 ]; then
@@ -115,9 +115,9 @@ else
             mv "$DEPLOYMENT_DIR-old_deploy" "$DEPLOYMENT_DIR"
 
             # Deploy previous version
-            docker-compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
+            docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
         fi
     else
-        docker-compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
+        docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
     fi
 fi
