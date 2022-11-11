@@ -93,7 +93,6 @@ else
 
         check_error_version_latest=$?
         if [ $check_error_version_latest -eq 0 ]; then
-            ls -la TalentumLAB
             echo "Successfully deploy latest"
             # Store the latest version and remove temporary files
             echo "$LATEST_VERSION" >"$DEPLOYMENT_DIR"/LATEST_VERSION.txt
@@ -106,7 +105,6 @@ else
                 echo "$name_folder_old"
                 rm -rf "${name_folder_old:?}"
             fi
-            ls -la TalentumLAB
         else
             # Delete the latest deployment with error
             rm -rf "${DEPLOYMENT_DIR:?}/"*
