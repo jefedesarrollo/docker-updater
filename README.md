@@ -6,12 +6,12 @@ For the application to work correctly you must run the aplication first without 
 ## Prerequisitos
 You need to have the following packages installed on Linux:
 
-* Install docker and docker compose ()
-* nohup
-* jq
-* curl
-* wget
-* unzip
+* Install docker V20.10.21 and docker compose V2.12.2
+* nohup V8.30
+* jq V1.6
+* curl V7.68.0
+* wget V1.20.3
+* unzip V3.0-11
 * sh files must have at least the following permissions:
 ```
     chmod +x file.sh
