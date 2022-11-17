@@ -16,7 +16,8 @@
 echo "-------- Start Updater Apps --------"
 logger -p local0.info -it apps-updater.sh.example  " Start execution docker script updater"
 # Exmaples:
+# logger -p local0.info -it apps-updater.sh.example  "Update app fabian/repository-example"
 # /var/tmp/docker-compose-updater.sh fabian/repository-example
-logger -p local0.info -it docker-compose-updater.sh " /var/tmp/docker-compose-updater.sh fabian/repository-example"
+# logger -p local0.info -it docker-compose-updater.sh "End Update app fabian/repository-example"
 echo "--------- End Updater Apps ---------"
 logger -p local0.info -it apps-updater.sh.example  "End execution docker script updater"
