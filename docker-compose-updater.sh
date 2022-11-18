@@ -43,10 +43,10 @@ download_release_file() {
         cp -R "$TMP_DIR"/"$(unzip -Z -1 "$ZIP_FILE" | head -1)"/* "$TMP_DIR" &&
         rm -R "${TMP_DIR:?}/$(unzip -Z -1 "$ZIP_FILE" | head -1)/" &&
         rm "$ZIP_FILE"
-        logger -p local0.debug -it docker-compose-updater "Extract zipball_url parameter from github repository"
-        logger -p local0.debug -it docker-compose-updater "Download  $ZIP_FILE"
-        logger -p local0.debug -it docker-compose-updater "Extract  $ZIP_FILE in $TMP_DIR"
-        logger -p local0.debug -it docker-compose-updater "Move files unziped and clean folders"
+    logger -p local0.debug -it docker-compose-updater "Extract zipball_url parameter from github repository"
+    logger -p local0.debug -it docker-compose-updater "Download  $ZIP_FILE"
+    logger -p local0.debug -it docker-compose-updater "Extract  $ZIP_FILE in $TMP_DIR"
+    logger -p local0.debug -it docker-compose-updater "Move files unziped and clean folders"
 
     logger -p local0.debug -it docker-compose-updater "End function download release file"
 }
@@ -59,8 +59,10 @@ checkExitsDirectory() {
     retval=""
     if [[ -d "$directory" ]]; then
         retval="true"
+        logger -p local0.debug -it docker-compose-updater "Assing variable (if exists directory = $retval)"
     else
         retval="false"
+        logger -p local0.debug -it docker-compose-updater "Assing variable (if not exists directory = $retval)"
     fi
     echo $retval
     logger -p local0.debug -it docker-compose-updater "Directory exists?= $retval"
