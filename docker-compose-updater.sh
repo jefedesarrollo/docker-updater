@@ -11,173 +11,200 @@
 # Example: /var/docker-compose-updater.sh fabian/repository-example
 #
 
+# Syslog variable
+app="$(echo "$1" | tr '/' '-')"
+
 # Get latest version
-logger -p local0.debug -it docker-compose-updater "Start docker-compose-updater"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "Start docker-compose-updater"
 get_latest_release() {
-    logger -p local0.debug -it docker-compose-updater "Start function get latest version"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Start function get latest version"
     GITHUB_REPO="$1"
-    logger -p local0.debug -it docker-compose-updater "GitHub Repository = $1"
-    logger -p local0.debug -it docker-compose-updater "Get tag name parameter from repository"
-    logger -p local0.debug -it docker-compose-updater "github url: 'https://api.github.com/repos/$GITHUB_REPO/releases/latest'"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "GitHub Repository = $1"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Get tag name parameter from repository"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "github url: 'https://api.github.com/repos/$GITHUB_REPO/releases/latest'"
     curl --silent "https://api.github.com/repos/$GITHUB_REPO/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/'
-    logger -p local0.debug -it docker-compose-updater "End function get latest version"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "End function get latest version"
 }
 
 # Download a new realease
 download_release_file() {
-    logger -p local0.debug -it docker-compose-updater "Start function download release file"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Start function download release file"
     GITHUB_REPO="$1"
-    logger -p local0.debug -it docker-compose-updater "GitHub Repository = $1"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "GitHub Repository = $1"
     TMP_DIR="$2"
-    logger -p local0.debug -it docker-compose-updater "Temporal directory = $2"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Temporal directory = $2"
     ZIP_FILE="$TMP_DIR/$3.zip"
-    logger -p local0.debug -it docker-compose-updater "Zip file = $ZIP_FILE"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Zip file = $ZIP_FILE"
 
-    logger -p local0.debug -it docker-compose-updater "Show git repository to extract and download info"
-    curl -Ls --location --request GET https://api.github.com/repos/"$GITHUB_REPO"/releases/latest |
-        jq -r ".zipball_url" |
-        wget -qi - -O "$ZIP_FILE" &&
-        unzip -q -o "$ZIP_FILE" -d "$TMP_DIR" &&
-        cp -R "$TMP_DIR"/"$(unzip -Z -1 "$ZIP_FILE" | head -1)"/* "$TMP_DIR" &&
-        rm -R "${TMP_DIR:?}/$(unzip -Z -1 "$ZIP_FILE" | head -1)/" &&
-        rm "$ZIP_FILE"
-    logger -p local0.debug -it docker-compose-updater "Extract zipball_url parameter from github repository"
-    logger -p local0.debug -it docker-compose-updater "Download  $ZIP_FILE"
-    logger -p local0.debug -it docker-compose-updater "Extract  $ZIP_FILE in $TMP_DIR"
-    logger -p local0.debug -it docker-compose-updater "Move files unziped and clean folders"
+    detect_release=""
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Start check release"
+    check_release="$(curl -Ls --location --request GET curl -Ls --location --request GET https://api.github.com/repos/TalentumLAB/lms_tumlab/releases/latest | jq -r '.message')"
 
-    logger -p local0.debug -it docker-compose-updater "End function download release file"
+    if [[ $check_release == 'Not Found' ]]; then
+        detect_release="false"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Assing variable detect_release = $detect_release)"
+        echo "Error: the project not have releases"
+        logger -p local0.err -it docker-compose-updater-app-"$app" "the project not have releases"
+    else
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Show git repository to extract and download info"
+        curl -Ls --location --request GET https://api.github.com/repos/"$GITHUB_REPO"/releases/latest |
+            jq -r ".zipball_url" |
+            wget -qi - -O "$ZIP_FILE" &&
+            unzip -q -o "$ZIP_FILE" -d "$TMP_DIR" &&
+            cp -R "$TMP_DIR"/"$(unzip -Z -1 "$ZIP_FILE" | head -1)"/* "$TMP_DIR" &&
+            rm -R "${TMP_DIR:?}/$(unzip -Z -1 "$ZIP_FILE" | head -1)/" &&
+            rm "$ZIP_FILE"
+
+        detect_release="true"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Assing variable detect_release = $detect_release)"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Extract zipball_url parameter from github repository"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Download  $ZIP_FILE"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Extract  $ZIP_FILE in $TMP_DIR"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Move files unziped and clean folders"
+    fi
+
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "End function download release file"
+    echo "$detect_release"
 }
 
 # Function check exists directory
 checkExitsDirectory() {
-    logger -p local0.debug -it docker-compose-updater "Start function check if exits directory"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Start function check if exits directory"
     directory="$1"
-    logger -p local0.debug -it docker-compose-updater "Directory to check = $directory"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Directory to check = $directory"
     retval=""
     if [[ -d "$directory" ]]; then
         retval="true"
-        logger -p local0.debug -it docker-compose-updater "Assing variable (if exists directory = $retval)"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Assing variable (if exists directory = $retval)"
     else
         retval="false"
-        logger -p local0.debug -it docker-compose-updater "Assing variable (if not exists directory = $retval)"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Assing variable (if not exists directory = $retval)"
     fi
     echo $retval
-    logger -p local0.debug -it docker-compose-updater "Directory exists?= $retval"
-    logger -p local0.debug -it docker-compose-updater "End function check if exists directory"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Directory exists?= $retval"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "End function check if exists directory"
 }
 
 GITHUB_REPOSITORY="$1"
-logger -p local0.debug -it docker-compose-updater "GITHUB REPOSITORY = $1"
+logger -p local0.debug -it docker-compose-updater-app-"$app"-app:"$1" "GITHUB REPOSITORY = $1"
 DEPLOYMENT_DIR="$1"
-logger -p local0.debug -it docker-compose-updater "DEPLOYMENT DIRECTORY = $1"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "DEPLOYMENT DIRECTORY = $1"
 TMP=$(cat "$DEPLOYMENT_DIR"/LATEST_VERSION.txt 2>/dev/null || true)
-logger -p local0.debug -it docker-compose-updater "Create temporal file= $TMP"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "Create temporal file= $TMP"
 CURRENT_VERSION="${TMP:-0.0.0}"
-logger -p local0.debug -it docker-compose-updater "Current version= $CURRENT_VERSION"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "Current version= $CURRENT_VERSION"
 LATEST_VERSION=$(get_latest_release "$GITHUB_REPOSITORY")
-logger -p local0.debug -it docker-compose-updater "Latest version= $LATEST_VERSION"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "Latest version= $LATEST_VERSION"
 
 # Check is a new version to deploy
-logger -p local0.debug -it docker-compose-updater "Check is a new version to deploy"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "Check is a new version to deploy"
 
 if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     if [ -e "$DEPLOYMENT_DIR" ]; then
         docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
-        logger -p local0.debug -it docker-compose-updater "Docker compose Start whit docker-compose.yml file"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose Start whit docker-compose.yml file"
     fi
     echo "Docker compose is already running the latest version ($LATEST_VERSION)"
-    logger -p local0.debug -it docker-compose-updater "Docker compose is already running the latest version $LATEST_VERSION"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose is already running the latest version $LATEST_VERSION"
 else
     # Check connection to internet
-    logger -p local0.debug -it docker-compose-updater "Check connection to internet"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Check connection to internet"
     wget -q --spider http://google.com
     check_internet=$?
-    logger -p local0.debug -it docker-compose-updater "Check internet = $?"
+    logger -p local0.debug -it docker-compose-updater-app-"$app" "Check internet = $?"
     if [ $check_internet -eq 0 ]; then
-        logger -p local0.debug -it docker-compose-updater "As the internet is available, update version"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "As the internet is available, update version"
         echo "Docker compose is running an old version (current: $CURRENT_VERSION, latest: $LATEST_VERSION)"
-        logger -p local0.debug -it docker-compose-updater "Docker compose is running an old version (current: $CURRENT_VERSION, latest: $LATEST_VERSION)"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose is running an old version (current: $CURRENT_VERSION, latest: $LATEST_VERSION)"
         # Download the latest release's files
-        logger -p local0.debug -it docker-compose-updater "Download the latest relese's files"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Download the latest relese's files"
         TMP_DIR=$(mktemp -d -t docker-compose-XXXXXXXXXX)
         echo "$TMP_DIR"
-        logger -p local0.debug -it docker-compose-updater "Temporal directory = $TMP_DIR"
-        download_release_file "$GITHUB_REPOSITORY" "$TMP_DIR" "$LATEST_VERSION"
-        logger -p local0.debug -it docker-compose-updater "Use function download_relese_file with variables= $GITHUB_REPOSITORY , $TMP_DIR , $LATEST_VERSION"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Temporal directory = $TMP_DIR"
 
-        # Copy previous deployment
-        logger -p local0.debug -it docker-compose-updater "Copy previous deployment"
-        is_exists_directory_repository=$(checkExitsDirectory "$DEPLOYMENT_DIR")
-        logger -p local0.debug -it docker-compose-updater "Check if exist directory ($DEPLOYMENT_DIR) whit function checkExitsDirectory"
-        logger -p local0.debug -it docker-compose-updater "Directory exist?= $is_exists_directory_repository"
-        if [[ $is_exists_directory_repository == 'true' ]]; then
-            logger -p local0.debug -it docker-compose-updater "As exists directory repository, clone directory with tag old-deploy"
-            # cp -R "$DEPLOYMENT_DIR" "$(echo "$DEPLOYMENT_DIR" | rev | cut -d'/' -f2- | rev)/$(basename "$DEPLOYMENT_DIR")-old_deploy"
-            cp -R "$DEPLOYMENT_DIR" "$DEPLOYMENT_DIR-old_deploy"
-        fi
+        is_exists_release=$(download_release_file "$GITHUB_REPOSITORY" "$TMP_DIR" "$LATEST_VERSION")
+        
+        if [[ $is_exists_release == 'true' ]]; then
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Use function download_relese_file with variables= $GITHUB_REPOSITORY , $TMP_DIR , $LATEST_VERSION"
 
-        # Stop the current deployment
-        logger -p local0.debug -it docker-compose-updater "Stop the current deployment"
-        if [ -e "$DEPLOYMENT_DIR" ]; then
-            docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
-            logger -p local0.debug -it docker-compose-updater "Stop deployment with docker compose"
-        else
-            mkdir -p "$DEPLOYMENT_DIR"
-            logger -p local0.debug -it docker-compose-updater "Create directory = $DEPLOYMENT_DIR"
-        fi
+            # Copy previous deployment
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Copy previous deployment"
+            is_exists_directory_repository=$(checkExitsDirectory "$DEPLOYMENT_DIR")
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Check if exist directory ($DEPLOYMENT_DIR) whit function checkExitsDirectory"
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Directory exist?= $is_exists_directory_repository"
+            if [[ $is_exists_directory_repository == 'true' ]]; then
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "As exists directory repository, clone directory with tag old-deploy"
+                # cp -R "$DEPLOYMENT_DIR" "$(echo "$DEPLOYMENT_DIR" | rev | cut -d'/' -f2- | rev)/$(basename "$DEPLOYMENT_DIR")-old_deploy"
+                cp -R "$DEPLOYMENT_DIR" "$DEPLOYMENT_DIR-old_deploy"
+            fi
 
-        # Delete the current deployment
-        logger -p local0.debug -it docker-compose-updater "Delete the current deployment"
-        rm -rf "${DEPLOYMENT_DIR:?}/"*
-        logger -p local0.debug -it docker-compose-updater "Move temporal dir to deployment_dir"
-        mv "$TMP_DIR"/* "$DEPLOYMENT_DIR"
+            # Stop the current deployment
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Stop the current deployment"
+            if [ -e "$DEPLOYMENT_DIR" ]; then
+                docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Stop deployment with docker compose"
+            else
+                mkdir -p "$DEPLOYMENT_DIR"
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Create directory = $DEPLOYMENT_DIR"
+            fi
 
-        # Deploy the application
-        docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
-        logger -p local0.debug -it docker-compose-updater "Deploy the application using docker compose = (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml up -d)"
-        exit_code=$?
-        logger -p local0.debug -it docker-compose-updater "exit code = $?"
-        if [ $exit_code -eq 0 ]; then
-            echo "Successfully deploy latest"
-            logger -p local0.debug -it docker-compose-updater "Successfully deploy latest"
-            # Store the latest version and remove temporary files
-            logger -p local0.debug -it docker-compose-updater "Store the latest version and remove temporary files"
-            echo "$LATEST_VERSION" >"$DEPLOYMENT_DIR"/LATEST_VERSION.txt
-            logger -p local0.debug -it docker-compose-updater "Docker compose is now running version ${LATEST_VERSION}"
-            echo "Docker compose is now running version ${LATEST_VERSION}"
+            # Delete the current deployment
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Delete the current deployment"
+            rm -rf "${DEPLOYMENT_DIR:?}/"*
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Move temporal dir to deployment_dir"
+            mv "$TMP_DIR"/* "$DEPLOYMENT_DIR"
 
-            # Remove copy temporal previus version
-            is_exists_previous_version=$(checkExitsDirectory "$DEPLOYMENT_DIR-old_deploy")
-            logger -p local0.debug -it docker-compose-updater "Check if exist previous version"
-            if [[ $is_exists_previous_version == 'true' ]]; then
-                logger -p local0.debug -it docker-compose-updater "As exists previous version, remove previous version"
-                name_folder_old="$DEPLOYMENT_DIR-old_deploy"
-                echo "$name_folder_old"
-                logger -p local0.debug -it docker-compose-updater "Name old folder= $name_folder_old"
-                rm -rf "${name_folder_old:?}"
-                logger -p local0.debug -it docker-compose-updater "Delete folder = $name_folder_old"
+            # Deploy the application
+            docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Deploy the application using docker compose = (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml up -d)"
+            exit_code=$?
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "exit code = $?"
+            if [ $exit_code -eq 0 ]; then
+                echo "Successfully deploy latest"
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Successfully deploy latest"
+                # Store the latest version and remove temporary files
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Store the latest version and remove temporary files"
+                echo "$LATEST_VERSION" >"$DEPLOYMENT_DIR"/LATEST_VERSION.txt
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose is now running version ${LATEST_VERSION}"
+                echo "Docker compose is now running version ${LATEST_VERSION}"
+
+                # Remove copy temporal previus version
+                is_exists_previous_version=$(checkExitsDirectory "$DEPLOYMENT_DIR-old_deploy")
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Check if exist previous version"
+                if [[ $is_exists_previous_version == 'true' ]]; then
+                    logger -p local0.debug -it docker-compose-updater-app-"$app" "As exists previous version, remove previous version"
+                    name_folder_old="$DEPLOYMENT_DIR-old_deploy"
+                    echo "$name_folder_old"
+                    logger -p local0.debug -it docker-compose-updater-app-"$app" "Name old folder= $name_folder_old"
+                    rm -rf "${name_folder_old:?}"
+                    logger -p local0.debug -it docker-compose-updater-app-"$app" "Delete folder = $name_folder_old"
+                fi
+            else
+                # Delete the latest deployment with error
+                logger -p local0.err -it docker-compose-updater-app-"$app" "Error deployment lastest version"
+                rm -rf "${DEPLOYMENT_DIR:?}/"*
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Remove ${DEPLOYMENT_DIR} and files"
+                # Rename previous version
+                mv "$DEPLOYMENT_DIR-old_deploy" "$DEPLOYMENT_DIR"
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Rename previous version"
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Old name = $DEPLOYMENT_DIR-old_deploy"
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "New name = $DEPLOYMENT_DIR"
+                # Deploy previous version
+                docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
+                logger -p local0.debug -it docker-compose-updater-app-"$app" "Deploy previous version whit command (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml down)"
             fi
         else
-            # Delete the latest deployment with error
-            logger -p local0.err -it docker-compose-updater "Error deployment lastest version"
-            rm -rf "${DEPLOYMENT_DIR:?}/"*
-            logger -p local0.debug -it docker-compose-updater "Remove ${DEPLOYMENT_DIR} and files"
-            # Rename previous version
-            mv "$DEPLOYMENT_DIR-old_deploy" "$DEPLOYMENT_DIR"
-            logger -p local0.debug -it docker-compose-updater "Rename previous version"
-            logger -p local0.debug -it docker-compose-updater "Old name = $DEPLOYMENT_DIR-old_deploy"
-            logger -p local0.debug -it docker-compose-updater "New name = $DEPLOYMENT_DIR"
-            # Deploy previous version
-            docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
-            logger -p local0.debug -it docker-compose-updater "Deploy previous version whit command (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml down)"
+            echo "Error: not exists releases"
+            logger -p local0.debug -it docker-compose-updater-app-"$app" "Not exists releases"
         fi
+
     else
-        logger -p local0.err -it docker-compose-updater "No internet conection"
+
+        logger -p local0.err -it docker-compose-updater-app-"$app" "No internet conection"
         docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
-        logger -p local0.debug -it docker-compose-updater "Deploy previous version whit command (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml down)"
+        logger -p local0.debug -it docker-compose-updater-app-"$app" "Deploy previous version whit command (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml down)"
     fi
 fi
-logger -p local0.debug -it docker-compose-updater "End docker-compose-updater"
+logger -p local0.debug -it docker-compose-updater-app-"$app" "End docker-compose-updater"
