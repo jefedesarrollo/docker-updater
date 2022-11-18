@@ -12,29 +12,30 @@
 #
 
 # Get latest version
-logger -p local0.debug -it docker-compose-updater  "Start docker-compose-updater"
+logger -p local0.debug -it docker-compose-updater "Start docker-compose-updater"
 get_latest_release() {
-    logger -p local0.debug -it docker-compose-updater  "Start function get latest version"
+    logger -p local0.debug -it docker-compose-updater "Start function get latest version"
     GITHUB_REPO="$1"
-    logger -p local0.debug -it docker-compose-updater  "GitHub Repository = $1"
-    logger -p local0.debug -it docker-compose-updater  "Get tag name parameter from repository"
+    logger -p local0.debug -it docker-compose-updater "GitHub Repository = $1"
+    logger -p local0.debug -it docker-compose-updater "Get tag name parameter from repository"
+    logger -p local0.debug -it docker-compose-updater "github url: 'https://api.github.com/repos/$GITHUB_REPO/releases/latest'"
     curl --silent "https://api.github.com/repos/$GITHUB_REPO/releases/latest" |
         grep '"tag_name":' |
         sed -E 's/.*"([^"]+)".*/\1/'
-    logger -p local0.debug -it docker-compose-updater  "End function get latest version"
+    logger -p local0.debug -it docker-compose-updater "End function get latest version"
 }
 
 # Download a new realease
 download_release_file() {
-    logger -p local0.debug -it docker-compose-updater  "Start function download release file"
+    logger -p local0.debug -it docker-compose-updater "Start function download release file"
     GITHUB_REPO="$1"
-    logger -p local0.debug -it docker-compose-updater  "GitHub Repository = $1"
+    logger -p local0.debug -it docker-compose-updater "GitHub Repository = $1"
     TMP_DIR="$2"
-    logger -p local0.debug -it docker-compose-updater  "Temporal directory = $2"
+    logger -p local0.debug -it docker-compose-updater "Temporal directory = $2"
     ZIP_FILE="$TMP_DIR/$3.zip"
-    logger -p local0.debug -it docker-compose-updater  "Zip file = $ZIP_FILE"
+    logger -p local0.debug -it docker-compose-updater "Zip file = $ZIP_FILE"
 
-    logger -p local0.debug -it docker-compose-updater  "Show git repository to extract and download info"
+    logger -p local0.debug -it docker-compose-updater "Show git repository to extract and download info"
     curl -Ls --location --request GET https://api.github.com/repos/"$GITHUB_REPO"/releases/latest |
         jq -r ".zipball_url" |
         wget -qi - -O "$ZIP_FILE" &&
@@ -42,19 +43,19 @@ download_release_file() {
         cp -R "$TMP_DIR"/"$(unzip -Z -1 "$ZIP_FILE" | head -1)"/* "$TMP_DIR" &&
         rm -R "${TMP_DIR:?}/$(unzip -Z -1 "$ZIP_FILE" | head -1)/" &&
         rm "$ZIP_FILE"
-        logger -p local0.debug -it docker-compose-updater  "Extract zipball_url parameter from github repository"
-        logger -p local0.debug -it docker-compose-updater  "Download  $ZIP_FILE"
-        logger -p local0.debug -it docker-compose-updater  "Extract  $ZIP_FILE in $TMP_DIR"
-        logger -p local0.debug -it docker-compose-updater  "Move files unziped and clean folders"
+        logger -p local0.debug -it docker-compose-updater "Extract zipball_url parameter from github repository"
+        logger -p local0.debug -it docker-compose-updater "Download  $ZIP_FILE"
+        logger -p local0.debug -it docker-compose-updater "Extract  $ZIP_FILE in $TMP_DIR"
+        logger -p local0.debug -it docker-compose-updater "Move files unziped and clean folders"
 
-    logger -p local0.debug -it docker-compose-updater  "End function download release file"
+    logger -p local0.debug -it docker-compose-updater "End function download release file"
 }
 
 # Function check exists directory
 checkExitsDirectory() {
-    logger -p local0.debug -it docker-compose-updater  "Start function check if exits directory"
+    logger -p local0.debug -it docker-compose-updater "Start function check if exits directory"
     directory="$1"
-    logger -p local0.debug -it docker-compose-updater  "Directory to check = $directory"
+    logger -p local0.debug -it docker-compose-updater "Directory to check = $directory"
     retval=""
     if [[ -d "$directory" ]]; then
         retval="true"
@@ -62,23 +63,23 @@ checkExitsDirectory() {
         retval="false"
     fi
     echo $retval
-    logger -p local0.debug -it docker-compose-updater  "Directory exists?= $retval"
-    logger -p local0.debug -it docker-compose-updater  "End function check if exists directory"
+    logger -p local0.debug -it docker-compose-updater "Directory exists?= $retval"
+    logger -p local0.debug -it docker-compose-updater "End function check if exists directory"
 }
 
 GITHUB_REPOSITORY="$1"
-logger -p local0.debug -it docker-compose-updater  "GITHUB REPOSITORY = $1"
+logger -p local0.debug -it docker-compose-updater "GITHUB REPOSITORY = $1"
 DEPLOYMENT_DIR="$1"
-logger -p local0.debug -it docker-compose-updater  "DEPLOYMENT DIRECTORY = $1"
+logger -p local0.debug -it docker-compose-updater "DEPLOYMENT DIRECTORY = $1"
 TMP=$(cat "$DEPLOYMENT_DIR"/LATEST_VERSION.txt 2>/dev/null || true)
-logger -p local0.debug -it docker-compose-updater  "Create temporal file= $TMP"
+logger -p local0.debug -it docker-compose-updater "Create temporal file= $TMP"
 CURRENT_VERSION="${TMP:-0.0.0}"
-logger -p local0.debug -it docker-compose-updater  "Current version= $CURRENT_VERSION"
+logger -p local0.debug -it docker-compose-updater "Current version= $CURRENT_VERSION"
 LATEST_VERSION=$(get_latest_release "$GITHUB_REPOSITORY")
-logger -p local0.debug -it docker-compose-updater  "Latest version= $LATEST_VERSION"
+logger -p local0.debug -it docker-compose-updater "Latest version= $LATEST_VERSION"
 
 # Check is a new version to deploy
-logger -p local0.debug -it docker-compose-updater  "Check is a new version to deploy"
+logger -p local0.debug -it docker-compose-updater "Check is a new version to deploy"
 
 if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     if [ -e "$DEPLOYMENT_DIR" ]; then
@@ -86,7 +87,7 @@ if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
         logger -p local0.debug -it docker-compose-updater "Docker compose Start whit docker-compose.yml file"
     fi
     echo "Docker compose is already running the latest version ($LATEST_VERSION)"
-    logger -p local0.debug -it docker-compose-updater  "Docker compose is already running the latest version $LATEST_VERSION"
+    logger -p local0.debug -it docker-compose-updater "Docker compose is already running the latest version $LATEST_VERSION"
 else
     # Check connection to internet
     logger -p local0.debug -it docker-compose-updater "Check connection to internet"
