@@ -16,6 +16,8 @@ You need to have the following packages installed on Linux:
 ```
     chmod +x file.sh
 ```
+* It must be taken into account that the parent folder where this application is going to be executed, it is recommended to create a user other than root with permissions `rwxr-xr-x` or `755` and that the content of the same folder is also inherited
+
 
 ## How to use
 You can use the application in 3 ways:
