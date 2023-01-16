@@ -11,6 +11,9 @@
 # Example: /var/docker-compose-updater.sh fabian/repository-example
 #
 
+# Wait time to check the internet connection - Only optional for check connection internet
+sleep 10
+
 # Syslog variable
 app="$(echo "$1" | tr '/' '-')"
 
@@ -40,7 +43,7 @@ download_release_file() {
 
     detect_release=""
     logger -p local0.debug -it docker-compose-updater-app-"$app" "Start check release"
-    check_release="$(curl -Ls --location --request GET curl -Ls --location --request GET https://api.github.com/repos/TalentumLAB/lms_tumlab/releases/latest | jq -r '.message')"
+    check_release="$(curl -Ls --location --request GET curl -Ls --location --request GET https://api.github.com/repos/"$GITHUB_REPO"/releases/latest | jq -r '.message')"
 
     if [[ $check_release == 'Not Found' ]]; then
         detect_release="false"
@@ -109,8 +112,6 @@ if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     echo "Docker compose is already running the latest version ($LATEST_VERSION)"
     logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose is already running the latest version $LATEST_VERSION"
 else
-    # Wait time to check the internet connection
-    sleep 3
     # Check connection to internet
     logger -p local0.debug -it docker-compose-updater-app-"$app" "Check connection to internet"
     wget -q --spider http://google.com
