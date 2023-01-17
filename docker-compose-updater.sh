@@ -93,12 +93,19 @@ checkExitsDirectory() {
 GITHUB_REPOSITORY="$1"
 logger -p local0.debug -it docker-compose-updater-app-"$app"-app:"$1" "GITHUB REPOSITORY = $1"
 path="$2"
-if [ "$path" = "" ]; then
-   DEPLOYMENT_DIR="$1"
-   echo "$DEPLOYMENT_DIR"
-else
+
+isexistpath=$(checkExitsDirectory "$path")
+
+if [ "$path" != "" ]; then
+  if [ "$isexistpath" == 'true' ]; then
     DEPLOYMENT_DIR="$path/$1"
-    echo "$DEPLOYMENT_DIR"
+    logger -p local0.debug -it docker-compose-updater-app-"$app"-app:"$1" "Path path to deployment: $DEPLOYMENT_DIR"
+    echo "Path path to deployment: $DEPLOYMENT_DIR"
+  else
+    echo "Path not exist or is null, run script with default: $DEPLOYMENT_DIR"
+    logger -p local0.debug -it docker-compose-updater-app-"$app"-app:"$1" "Path not exist or is null, run script with default: $DEPLOYMENT_DIR"
+    DEPLOYMENT_DIR="$1"
+  fi
 fi
 
 logger -p local0.debug -it docker-compose-updater-app-"$app" "DEPLOYMENT DIRECTORY = $1"
