@@ -9,15 +9,15 @@
 #
 # You can run the file in 2 ways:
 # - Allows to release the console after executing the line
-#   nohup {path}/docker-compose-updater.sh {github_username}/{github_repository} &!
+#   nohup {path}/docker-compose-updater.sh {github_username}/{github_repository} {path/to/download/repository}&!
 # - Execute the line and wait for it to finish to continue with the next one.
-#   {path}/docker-compose-updater.sh {github_username}/{github_repository}
+#   {path}/docker-compose-updater.sh {github_username}/{github_repository} {path/to/download/repository}
 # 
 echo "-------- Start Updater Apps --------"
 logger -p local0.info -it apps-updater.sh.example  " Start execution docker script updater"
 # Exmaples:
 # logger -p local0.info -it apps-updater.sh.example  "Update app fabian/repository-example"
-# /var/tmp/docker-compose-updater.sh fabian/repository-example
+# /var/tmp/docker-compose-updater.sh fabian/repository-example path/to/download/repository
 # logger -p local0.info -it docker-compose-updater.sh "End Update app fabian/repository-example"
 echo "--------- End Updater Apps ---------"
 logger -p local0.info -it apps-updater.sh.example  "End execution docker script updater"

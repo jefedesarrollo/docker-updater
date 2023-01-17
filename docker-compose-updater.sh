@@ -92,7 +92,15 @@ checkExitsDirectory() {
 
 GITHUB_REPOSITORY="$1"
 logger -p local0.debug -it docker-compose-updater-app-"$app"-app:"$1" "GITHUB REPOSITORY = $1"
-DEPLOYMENT_DIR="$1"
+path="$2"
+if [ "$path" = "" ]; then
+   DEPLOYMENT_DIR="$1"
+   echo "$DEPLOYMENT_DIR"
+else
+    DEPLOYMENT_DIR="$path/$1"
+    echo "$DEPLOYMENT_DIR"
+fi
+
 logger -p local0.debug -it docker-compose-updater-app-"$app" "DEPLOYMENT DIRECTORY = $1"
 TMP=$(cat "$DEPLOYMENT_DIR"/LATEST_VERSION.txt 2>/dev/null || true)
 logger -p local0.debug -it docker-compose-updater-app-"$app" "Create temporal file= $TMP"
