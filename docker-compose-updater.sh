@@ -229,7 +229,7 @@ else
                 else
                     # Delete the latest deployment with error
                     logger -p local0.err -it docker-compose-updater-app-"$app" "Error deployment lastest version"
-                    rm -rf "${DEPLOYMENT_DIR:?}/"*
+                    rm -r "$DEPLOYMENT_DIR"
                     logger -p local0.debug -it docker-compose-updater-app-"$app" "Remove ${DEPLOYMENT_DIR} and files"
                     # Rename previous version
                     mv "$DEPLOYMENT_DIR-old_deploy" "$DEPLOYMENT_DIR"
