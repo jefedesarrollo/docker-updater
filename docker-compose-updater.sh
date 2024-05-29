@@ -195,7 +195,7 @@ else
                 mv "$TMP_DIR"/* "$DEPLOYMENT_DIR"
 
                 # Deploy the application
-                existcomposefile=$(checkexistsfile "$DEPLOYMENT_DIR"/docker-compose.yml)
+                existcomposefile=$(checkExitsFile "$DEPLOYMENT_DIR"/docker-compose.yml)
                 if [[ $existcomposefile == 'true' ]]; then
                     docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
                     exit_code=0
