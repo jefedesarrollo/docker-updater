@@ -237,7 +237,7 @@ else
                     logger -p local0.debug -it docker-compose-updater-app-"$app" "Old name = $DEPLOYMENT_DIR-old_deploy"
                     logger -p local0.debug -it docker-compose-updater-app-"$app" "New name = $DEPLOYMENT_DIR"
                     # Deploy previous version
-                    docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml down
+                    docker compose -f "$DEPLOYMENT_DIR"/docker-compose.yml up -d
                     logger -p local0.debug -it docker-compose-updater-app-"$app" "Deploy previous version whit command (docker compose -f $DEPLOYMENT_DIR/docker-compose.yml down)"
                 fi
             else
