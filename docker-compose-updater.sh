@@ -145,7 +145,7 @@ if [ "$CURRENT_VERSION" = "$LATEST_VERSION" ]; then
     echo "Docker compose is already running the latest version ($LATEST_VERSION)"
     logger -p local0.debug -it docker-compose-updater-app-"$app" "Docker compose is already running the latest version $LATEST_VERSION"
 else
-    if [ "$LATEST_VERSION" = "" ]; then
+    if [ "$LATEST_VERSION" != "" ]; then
     
         # Check connection to internet
         logger -p local0.debug -it docker-compose-updater-app-"$app" "Check connection to internet"
